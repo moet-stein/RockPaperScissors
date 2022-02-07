@@ -2,7 +2,7 @@
 //  RockPaperScissorsApp.swift
 //  RockPaperScissors
 //
-//  Created by Philipp Steinmüller on 2022/01/31.
+//  Created by Moe Steinmüller on 2022/01/31.
 //
 
 import SwiftUI
