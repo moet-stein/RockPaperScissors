@@ -14,9 +14,6 @@ struct GrowingButton: ButtonStyle {
             .background(Color(red: 1.0, green: 0.2, blue: 0.2, opacity: 0.6))
             .font(.largeTitle)
             .foregroundColor(.white)
-            .clipShape(Capsule())
-            .scaleEffect(configuration.isPressed ? 1.2 : 1)
-            .animation(.easeOut(duration: 0.2), value: configuration.isPressed)
     }
 }
 
@@ -28,6 +25,7 @@ struct ContentView: View {
     @State private var appChoice = choices.randomElement()
     @State private var time = 0.0
     @State private var started = false
+    @State private var animationAmount = 1.0
     @State private var showingNext = false
     @State private var gameIsDone = false
     @State private var win = Bool.random()
@@ -74,13 +72,25 @@ struct ContentView: View {
             
             VStack {
                 Spacer()
-                
-                
 
                 Button(started ? "Playing.." : "Start", action: startBtnPushed)
                         .buttonStyle(GrowingButton())
-                        .padding(.top, 40)
-            
+                        .disabled(started == true)
+                        .clipShape(RoundedRectangle(cornerRadius: 25, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 25, style: .continuous)
+                                .stroke(.red)
+                                .scaleEffect(animationAmount)
+                                .opacity(2 - animationAmount)
+                                .animation(
+                                    .easeInOut(duration: 1)
+                                        .repeatForever(autoreverses: true),
+                                    value: animationAmount)
+                        )
+                        .opacity(started ? 0 : 1)
+                        .onAppear {
+                            animationAmount = 2
+                        }
                 
                 
                 
@@ -135,6 +145,7 @@ struct ContentView: View {
                                     .frame(width: 100, height: 100)
                                     .padding(.horizontal, 8)
                             }
+                            .disabled(started == false)
                         }
                     }
                 }
@@ -211,12 +222,14 @@ struct ContentView: View {
         win = Bool.random()
         time = 0.0
         started = false
+        animationAmount = 2.0
     }
     
     func startBtnPushed() {
         appChoice = ContentView.choices[Int.random(in: 0..<ContentView.choices.count)]
         win = Bool.random()
         started = true
+        
     }
 }
 
