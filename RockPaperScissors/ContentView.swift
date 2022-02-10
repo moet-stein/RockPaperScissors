@@ -25,7 +25,7 @@ struct ContentView: View {
     @State private var appChoice = choices.randomElement()
     @State private var time = 0.0
     @State private var started = false
-    @State private var animationAmount = 0.0
+    @State private var animationAmount = 1.0
     @State private var showingNext = false
     @State private var gameIsDone = false
     @State private var win = Bool.random()
@@ -34,6 +34,7 @@ struct ContentView: View {
     @State private var userAnswer: String?
     @State private var result = ""
     
+    @State var animationAmountChoices = 0.0
     @State var scale: CGFloat = 1
     @State var chosenCorrect = false
     @State var chosenWrong = false
@@ -153,7 +154,7 @@ struct ContentView: View {
                                     .resizable()
                                     .frame(width: 100, height: 100)
                                     .padding(.horizontal, 8)
-                                    .rotation3DEffect(.degrees(correctAnswer == choice ? animationAmount : 0.0), axis: (x: 0, y: 1, z: 1))
+                                    .rotation3DEffect(.degrees(correctAnswer == choice ? animationAmountChoices : 0.0), axis: (x: 0, y: 1, z: 1))
                                     .opacity(choice != correctAnswer && chosenCorrect ? animateOpacity : 1)
                                     .opacity(chosenWrong && choice != selectedChoice ? animateOpacity : 1)
                                     .background(chosenWrong && selectedChoice == choice ? Capsule(style: .circular).fill(Color.red).blur(radius: 30) : Capsule(style: .circular).fill(Color.clear).blur(radius: 0))
@@ -215,7 +216,7 @@ struct ContentView: View {
             correctPoints += 1
             result = "CORRECT"
             withAnimation {
-                animationAmount += 360
+                animationAmountChoices += 360
                 animateOpacity = 0.25
                 chosenCorrect = true
             }
@@ -252,6 +253,8 @@ struct ContentView: View {
         time = 0.0
         started = false
         animationAmount = 2.0
+        chosenWrong = false
+        chosenCorrect = false
     }
     
     func startBtnPushed() {
