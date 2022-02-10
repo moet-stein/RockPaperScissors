@@ -25,7 +25,7 @@ struct ContentView: View {
     @State private var appChoice = choices.randomElement()
     @State private var time = 0.0
     @State private var started = false
-    @State private var animationAmount = 1.0
+    @State private var animationAmount = 0.0
     @State private var showingNext = false
     @State private var gameIsDone = false
     @State private var win = Bool.random()
@@ -33,6 +33,12 @@ struct ContentView: View {
     @State private var wrontPoints = 0
     @State private var userAnswer: String?
     @State private var result = ""
+    
+    @State var scale: CGFloat = 1
+    @State var chosenCorrect = false
+    @State var chosenWrong = false
+    @State var animateOpacity = 1.0
+    @State var selectedChoice = ""
     
     static var choices = ["Rock", "Paper", "Scissors"]
     
@@ -116,6 +122,8 @@ struct ContentView: View {
                         .resizable()
                         .frame(width: 120, height: 120)
                         .padding(.bottom, 30)
+                        
+                    
                     Text(win ? "WIN" : "LOSE")
                         .font(.largeTitle)
                         .bold()
@@ -138,15 +146,22 @@ struct ContentView: View {
                     HStack {
                         ForEach(ContentView.choices, id: \.self) { choice in
                             Button {
+                                selectedChoice = choice
                                 answerTapped(choice)
                             } label: {
                                 Image(choice)
                                     .resizable()
                                     .frame(width: 100, height: 100)
                                     .padding(.horizontal, 8)
+                                    .rotation3DEffect(.degrees(correctAnswer == choice ? animationAmount : 0.0), axis: (x: 0, y: 1, z: 1))
+                                    .opacity(choice != correctAnswer && chosenCorrect ? animateOpacity : 1)
+                                    .opacity(chosenWrong && choice != selectedChoice ? animateOpacity : 1)
+                                    .background(chosenWrong && selectedChoice == choice ? Capsule(style: .circular).fill(Color.red).blur(radius: 30) : Capsule(style: .circular).fill(Color.clear).blur(radius: 0))
                             }
                             .disabled(started == false)
+                            
                         }
+                        
                     }
                 }
                 .padding(.vertical, 30)
@@ -195,13 +210,24 @@ struct ContentView: View {
     }
     
     func answerTapped(_ userAnswer: String) {
-        ContentView.choices.shuffle()
+        
         if userAnswer == correctAnswer {
             correctPoints += 1
             result = "CORRECT"
+            withAnimation {
+                animationAmount += 360
+                animateOpacity = 0.25
+                chosenCorrect = true
+            }
         } else {
             wrontPoints += 1
             result = "WRONG"
+            chosenWrong = true
+            
+            withAnimation {
+                animateOpacity = 0.25
+                chosenWrong = true
+            }
         }
         showingNext = true
     }
@@ -210,6 +236,9 @@ struct ContentView: View {
         if correctPoints + wrontPoints >= 8 {
             gameIsDone = true
         } else {
+            chosenWrong = false
+            chosenCorrect = false
+            ContentView.choices.shuffle()
             appChoice = ContentView.choices[Int.random(in: 0..<ContentView.choices.count)]
             win = Bool.random()
         }
